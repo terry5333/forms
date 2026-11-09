@@ -3,90 +3,334 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級語錄</title>
+  <title>班級個人語錄一覽</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
     body {
       font-family: 'Inter', 'Noto Sans TC', -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, #e0e7ff 0%, #f1f5f9 50%, #e0f2fe 100%);
-      background-attachment: fixed;
+      background-color: #eef2ff;
       min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    /* 極簡液態毛玻璃卡片 */
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.55);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
+    /* 液態流動背景光球 */
+    .liquid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e0e7ff 100%);
+    }
+
+    .blob {
+      position: absolute;
+      filter: blur(70px);
+      opacity: 0.75;
+      border-radius: 50%;
+      animation: float 16s infinite ease-in-out alternate;
+    }
+
+    .blob-1 {
+      width: 420px;
+      height: 420px;
+      background: linear-gradient(135deg, #a5b4fc 0%, #67e8f9 100%);
+      top: -10%;
+      left: -5%;
+      animation-delay: 0s;
+    }
+
+    .blob-2 {
+      width: 380px;
+      height: 380px;
+      background: linear-gradient(135deg, #f9a8d4 0%, #c4b5fd 100%);
+      top: 35%;
+      right: -8%;
+      animation-delay: -5s;
+      animation-duration: 20s;
+    }
+
+    .blob-3 {
+      width: 450px;
+      height: 450px;
+      background: linear-gradient(135deg, #99f6e4 0%, #bae6fd 100%);
+      bottom: -12%;
+      left: 15%;
+      animation-delay: -10s;
+      animation-duration: 18s;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(40px, -30px) scale(1.08) rotate(12deg); }
+      100% { transform: translate(-25px, 40px) scale(0.95) rotate(-8deg); }
+    }
+
+    /* 主容器液態玻璃效果 */
+    .liquid-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.28) 100%);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 
+        0 20px 40px -15px rgba(31, 38, 135, 0.1),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.95),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.4);
+    }
+
+    /* 列表單行液態膠囊 */
+    .liquid-row {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.22) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 
+        0 4px 15px -3px rgba(15, 23, 42, 0.04),
+        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .liquid-row:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.45) 100%);
+      transform: translateY(-2px) scale(1.006);
+      border-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        0 12px 24px -6px rgba(99, 102, 241, 0.12),
+        inset 0 1.5px 2px rgba(255, 255, 255, 1);
+    }
+
+    /* 水滴立體座號徽章 */
+    .droplet-badge {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(224, 231, 255, 0.55));
       border: 1px solid rgba(255, 255, 255, 0.85);
       box-shadow: 
-        0 12px 32px -8px rgba(15, 23, 42, 0.06),
-        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+        0 4px 10px rgba(99, 102, 241, 0.15),
+        inset 0 2px 3px rgba(255, 255, 255, 1),
+        inset 0 -2px 4px rgba(99, 102, 241, 0.12);
     }
 
-    /* 水滴感座號 */
-    .seat-badge {
-      background: rgba(255, 255, 255, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04), inset 0 1px 1px #fff;
+    .droplet-empty {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.45), rgba(241, 245, 249, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    }
+
+    /* 玻璃按鈕 */
+    .liquid-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.35) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 
+        0 4px 12px rgba(15, 23, 42, 0.05),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+      transition: all 0.2s ease;
+    }
+
+    .liquid-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+      transform: translateY(-1px);
+    }
+
+    .liquid-btn-primary {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.85) 0%, rgba(56, 189, 248, 0.85) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 
+        0 8px 20px -4px rgba(99, 102, 241, 0.4),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.65);
+      transition: all 0.2s ease;
+    }
+
+    .liquid-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 
+        0 10px 24px -4px rgba(99, 102, 241, 0.55),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
     }
   </style>
 </head>
-<body class="py-10 px-4 text-slate-800">
+<body class="py-8 px-4 sm:px-6 text-slate-800">
+  <!-- 動態液態背景 -->
+  <div class="liquid-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
 
-  <div class="max-w-xl mx-auto">
-    <!-- 簡潔標題與一鍵複製 -->
-    <div class="flex items-center justify-between mb-4 px-2">
-      <h1 class="text-xl font-semibold tracking-tight text-slate-800">班級語錄</h1>
-      <button onclick="copyAll()" id="copy-btn" class="glass-panel px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:bg-white/80 transition">
-        複製全部
-      </button>
+  <div class="max-w-3xl mx-auto">
+    <!-- 頂部液態玻璃控制面板 -->
+    <div class="liquid-glass rounded-3xl p-6 sm:p-7 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <span class="inline-block text-xs font-semibold tracking-wider uppercase px-3 py-1 rounded-full bg-white/50 text-indigo-600 border border-white/80 shadow-sm mb-2">
+            Class Quotes
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-700 bg-clip-text text-transparent">
+            班級個人語錄一覽
+          </h1>
+          <p id="stats-text" class="text-sm text-slate-600 mt-1 font-medium">正在同步雲端試算表...</p>
+        </div>
+
+        <div class="flex items-center gap-2.5 self-start sm:self-center">
+          <button onclick="loadData()" class="liquid-btn px-4 py-2.5 text-sm font-medium text-slate-700 rounded-2xl flex items-center gap-1.5">
+            <span>重新整理</span>
+          </button>
+          <button onclick="copyAll()" id="copy-all-btn" class="liquid-btn-primary px-4 py-2.5 text-sm font-semibold text-white rounded-2xl">
+            複製全部語錄
+          </button>
+        </div>
+      </div>
+
+      <!-- 液態進度條與篩選膠囊 -->
+      <div class="mt-6 pt-5 border-t border-white/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1.5">
+            <span>收集進度</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="w-full h-2.5 bg-white/40 rounded-full overflow-hidden p-0.5 border border-white/60 shadow-inner">
+            <div id="progress-bar" class="h-full rounded-full bg-gradient-to-r from-indigo-500 via-sky-400 to-teal-300 transition-all duration-700" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 bg-white/35 p-1 rounded-2xl border border-white/60 self-start sm:self-end">
+          <button onclick="setFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-white/85 text-indigo-700 shadow-sm">全部</button>
+          <button onclick="setFilter('submitted')" id="filter-submitted" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900">已填寫</button>
+          <button onclick="setFilter('pending')" id="filter-pending" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900">未填寫</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 單一毛玻璃清單：左邊座號、右邊語錄 -->
-    <div id="list" class="glass-panel rounded-3xl divide-y divide-white/60 overflow-hidden">
-      <div class="p-8 text-center text-sm text-slate-400">載入中...</div>
+    <!-- 語錄膠囊列表 -->
+    <div id="list-container" class="space-y-3">
+      <div class="liquid-glass rounded-3xl p-12 text-center text-slate-500 font-medium animate-pulse">
+        正在折射試算表資料中...
+      </div>
     </div>
   </div>
 
   <script>
-    // 請換成你的 Google Apps Script (/exec) 網址
+    // 請將下方換成你的 Google Apps Script 網頁應用程式 (/exec) 網址
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzrz7knLW8T9V1x70gjTJUHJ4-Ag1OxC9lY_yV5zNJ9IEfDVZagseIaeiTVw2ZaYWON/exec';
 
-    let quotesData = [];
+    let currentData = [];
+    let currentFilter = 'all';
 
     async function loadData() {
-      const list = document.getElementById('list');
-      try {
-        const res = await fetch(GAS_API_URL, { redirect: 'follow' });
-        quotesData = await res.json();
+      const container = document.getElementById('list-container');
+      container.innerHTML = `
+        <div class="liquid-glass rounded-3xl p-12 text-center text-slate-500 font-medium animate-pulse">
+          正在同步最新語錄...
+        </div>`;
 
-        list.innerHTML = quotesData.map(item => `
-          <div class="flex items-baseline gap-4 px-5 py-3.5 hover:bg-white/40 transition">
-            <span class="seat-badge w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-semibold ${item.submitted ? 'text-slate-700' : 'text-slate-300'}">
-              ${item.seat}
-            </span>
-            <span class="text-sm leading-relaxed break-words ${item.submitted ? 'text-slate-800 font-medium' : 'text-slate-300'}">
-              ${item.submitted ? escapeHtml(item.quote) : '—'}
-            </span>
-          </div>
-        `).join('');
-      } catch (e) {
-        list.innerHTML = `<div class="p-8 text-center text-sm text-rose-500">資料讀取失敗</div>`;
+      try {
+        const response = await fetch(GAS_API_URL, { redirect: 'follow' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        currentData = data;
+        updateStats();
+        renderList();
+      } catch (err) {
+        container.innerHTML = `
+          <div class="liquid-glass rounded-3xl p-8 text-center text-rose-600 font-medium">
+            讀取失敗：請確認 GAS_API_URL 是否正確且存取權設為「任何人」<br>
+            <span class="text-xs text-rose-400 mt-1 block">(${err.message})</span>
+          </div>`;
       }
     }
 
+    function updateStats() {
+      const total = currentData.length;
+      const submittedCount = currentData.filter(d => d.submitted).length;
+      const percent = total ? Math.round((submittedCount / total) * 100) : 0;
+
+      document.getElementById('stats-text').textContent = 
+        `應填 ${total} 人 ｜ 已完成 ${submittedCount} 人 ｜ 待填寫 ${total - submittedCount} 人`;
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      ['all', 'submitted', 'pending'].forEach(key => {
+        const btn = document.getElementById(`filter-${key}`);
+        if (key === filter) {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-white/85 text-indigo-700 shadow-sm';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 hover:text-slate-900';
+        }
+      });
+      renderList();
+    }
+
+    function renderList() {
+      const container = document.getElementById('list-container');
+      const filtered = currentData.filter(item => {
+        if (currentFilter === 'submitted') return item.submitted;
+        if (currentFilter === 'pending') return !item.submitted;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="liquid-glass rounded-3xl p-10 text-center text-slate-500 font-medium">
+            目前此分類沒有座號資料
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => `
+        <div class="liquid-row rounded-2xl px-4 py-3.5 sm:px-5 flex items-center justify-between gap-4 ${item.submitted ? '' : 'opacity-65'}">
+          <div class="flex items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
+            <div class="w-10 h-10 rounded-2xl flex-shrink-0 flex items-center justify-center font-bold text-sm ${item.submitted ? 'droplet-badge text-indigo-700' : 'droplet-empty text-slate-400'}">
+              ${String(item.seat).padStart(2, '0')}
+            </div>
+
+            <div class="min-w-0 flex-1">
+              ${item.submitted 
+                ? `<p class="text-slate-800 font-medium text-base leading-relaxed break-words">${escapeHtml(item.quote)}</p>
+                   <span class="text-[11px] text-slate-400 font-medium">最後更新：${item.time}</span>` 
+                : `<p class="text-slate-400 text-sm italic">尚未填寫語錄</p>`
+              }
+            </div>
+          </div>
+
+          <div class="flex-shrink-0">
+            ${item.submitted 
+              ? `<button onclick="copySingle(${item.seat}, this)" class="liquid-btn text-xs font-semibold px-3.5 py-2 rounded-xl text-slate-700 hover:text-indigo-600">
+                   複製
+                 </button>` 
+              : `<span class="text-xs font-medium text-slate-400 px-2">待繳交</span>`
+            }
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function copySingle(seat, btn) {
+      const item = currentData.find(d => d.seat === seat);
+      if (!item) return;
+      navigator.clipboard.writeText(item.quote).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '已複製 ✓';
+        btn.classList.add('text-emerald-600');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('text-emerald-600');
+        }, 1500);
+      });
+    }
+
     function copyAll() {
-      if (!quotesData.length) return;
-      const text = quotesData
-        .map(d => `${d.seat}號：${d.submitted ? d.quote : ''}`)
+      const text = currentData
+        .map(d => `${String(d.seat).padStart(2, '0')}號：${d.submitted ? d.quote : '（尚未填寫）'}`)
         .join('\n');
       navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = '已複製 ✓';
-        setTimeout(() => btn.textContent = '複製全部', 1500);
+        const btn = document.getElementById('copy-all-btn');
+        btn.textContent = '已複製全部 ✓';
+        setTimeout(() => btn.textContent = '複製全部語錄', 2000);
       });
     }
 
